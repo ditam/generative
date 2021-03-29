@@ -10,7 +10,7 @@ let sourceImageData = null;
 let offscreenCtx;
 
 const CANDIDATES_PER_STEP = 20;
-const STEP_DELAY = 100;
+const STEP_DELAY = 10;
 
 function getRandomInt(min, max) { // min max inclusive
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -37,12 +37,14 @@ function getRandomStroke() {
   const b = getRandomInt(0, 255);
   const a = Math.random();
 
+  const verticeCount = 3;
+  const points = [];
+  for (let i=0; i<verticeCount; i++) {
+    points.push([getRandomInt(0, WIDTH), getRandomInt(0, HEIGHT)]);
+  }
+
   return {
-    points: [
-      [getRandomInt(0, WIDTH), getRandomInt(0, HEIGHT)],
-      [getRandomInt(0, WIDTH), getRandomInt(0, HEIGHT)],
-      [getRandomInt(0, WIDTH), getRandomInt(0, HEIGHT)]
-    ],
+    points: points,
     color: `rgba(${r},${g},${b},${a})`
   };
 }
