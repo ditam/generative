@@ -61,6 +61,7 @@ function drawStroke(_stroke) {
   ctx.fill();
 }
 
+let previousAvgDiff = 255 * 4;
 function run() {
   // TODO: handle multiple clicks - disable or singleton
 
@@ -110,12 +111,16 @@ function run() {
 
   }
 
-  // reload saved state, apply selected stroke and save
-  ctx.clearRect(0, 0, WIDTH, HEIGHT);
-  ctx.drawImage(offscreenCtx.canvas, 0, 0);
-  drawStroke(bestStroke);
-  offscreenCtx.clearRect(0, 0, WIDTH, HEIGHT);
-  offscreenCtx.drawImage(ctx.canvas, 0, 0);
+  // only add the new stroke if it was an improvement
+  if (bestDiff < previousAvgDiff) {
+    previousAvgDiff = bestDiff;
+    // reload saved state, apply selected stroke and save
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    ctx.drawImage(offscreenCtx.canvas, 0, 0);
+    drawStroke(bestStroke);
+    offscreenCtx.clearRect(0, 0, WIDTH, HEIGHT);
+    offscreenCtx.drawImage(ctx.canvas, 0, 0);
+  }
 
   setTimeout(run, STEP_DELAY);
 }
