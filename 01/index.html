@@ -1,0 +1,31 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+  <title>Hello Canvas</title>
+
+  <link rel="stylesheet" type="text/css" href="../ext/reset.css">
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+  <canvas id="source-canvas"></canvas>
+  <canvas id="target-canvas"></canvas>
+
+  <input type="file" id="fileInput" accept="image/*" />
+
+  <button class="button clear">clear</button>
+  <button class="button run">run</button>
+  <button class="button stop">stop</button>
+
+  <div class="description">
+    Upload an image on the left, a low-sample Monte Carlo simulation will attempt
+    to draw it on the right. Every step a set of random brushstrokes are generated,
+    each are painted to the canvas, and then the canvases are evaluated for difference
+    -- the best brushstroke is kept.
+  </div>
+
+  <script src="../ext/jquery.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

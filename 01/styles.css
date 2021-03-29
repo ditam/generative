@@ -1,0 +1,31 @@
+body {
+  background-color: #eee;
+}
+
+canvas {
+  display: inline-block;
+  background-color: white;
+  border: 1px solid gray;
+}
+
+canvas:first-child {
+  cursor: pointer;
+}
+
+input {
+  display: none;
+}
+
+.button {
+  display: inline-block;
+  margin-right: 30px;
+  padding: 6px;
+  margin: 12px;
+  cursor: pointer;
+}
+
+.description {
+  max-width: 800px;
+  line-height: 1.2em;
+  padding: 0 12px;
+}
