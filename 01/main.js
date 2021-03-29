@@ -5,10 +5,12 @@ const HEIGHT = 333;
 let sourceCtx, ctx;
 let sourceImageData = null;
 
-let xPosition = 0;
+// as a performance improvement, an off-screen canvas holds the
+// composite image of the strokes selected so far.
+let offscreenCtx;
 
-const CANDIDATES_PER_STEP = 50;
-const STEP_DELAY = 200;
+const CANDIDATES_PER_STEP = 20;
+const STEP_DELAY = 100;
 
 function getRandomInt(min, max) { // min max inclusive
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -45,8 +47,6 @@ function getRandomStroke() {
   };
 }
 
-const strokes = [];
-
 function drawStroke(_stroke) {
   // shifting mutates stroke, so we deep copy
   const stroke = JSON.parse(JSON.stringify(_stroke));
@@ -68,12 +68,13 @@ function run() {
   let bestDiff = 255 * 4;
   let bestStroke = null;
 
-  for (let i=0; i<CANDIDATES_PER_STEP; i++) {
+  for (let _i=0; _i<CANDIDATES_PER_STEP; _i++) {
     const stroke = getRandomStroke();
 
-    // draw previous strokes
+    // reset canvas to saved state
+    // NB: drawimage accepts an other canvas, but not a canvasContext
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    strokes.forEach(drawStroke);
+    ctx.drawImage(offscreenCtx.canvas, 0, 0);
 
     // draw candidate
     drawStroke(stroke);
@@ -109,13 +110,12 @@ function run() {
 
   }
 
-  console.log('best candidate:', bestStroke);
-  // save best stroke to permanent strokes
-  strokes.push(bestStroke);
-
-  // redraw permanent strokes
+  // reload saved state, apply selected stroke and save
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
-  strokes.forEach(drawStroke);
+  ctx.drawImage(offscreenCtx.canvas, 0, 0);
+  drawStroke(bestStroke);
+  offscreenCtx.clearRect(0, 0, WIDTH, HEIGHT);
+  offscreenCtx.drawImage(ctx.canvas, 0, 0);
 
   setTimeout(run, STEP_DELAY);
 }
@@ -123,10 +123,16 @@ function run() {
 $(document).ready(function() {
   const sourceCanvas = document.getElementById('source-canvas');
   const targetCanvas = document.getElementById('target-canvas');
-  $(sourceCanvas).attr('height', HEIGHT);
   $(sourceCanvas).attr('width', WIDTH);
-  $(targetCanvas).attr('height', HEIGHT);
+  $(sourceCanvas).attr('height', HEIGHT);
   $(targetCanvas).attr('width', WIDTH);
+  $(targetCanvas).attr('height', HEIGHT);
+
+  // create an offscreen canvas
+  const offscreenCanvas = $('<canvas>');
+  offscreenCanvas.attr('width', WIDTH);
+  offscreenCanvas.attr('height', HEIGHT);
+  offscreenCtx = offscreenCanvas.get(0).getContext('2d');
 
   sourceCtx = sourceCanvas.getContext('2d');
   ctx = targetCanvas.getContext('2d');
