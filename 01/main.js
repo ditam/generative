@@ -94,6 +94,8 @@ function drawStroke(_stroke, context) {
   if (stroke.type === 'clear') {
     // we abuse the data structure and consider the first 2 polygon points
     // as corners of the clearing rectangle. What are you gonna do about it, punk?
+    // TODO: we should be able to support polygon clears with different compositing modes,
+    //       see https://stackoverflow.com/a/8446964
     const P1 = stroke.points.shift();
     const P2 = stroke.points.shift();
     const x0 = Math.min(P1[0], P2[0]);
