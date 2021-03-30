@@ -11,7 +11,12 @@ let sourceImageData = null;
 let compositeCtx, candidateCtx;
 
 // increase this for better convergence, but note that it has an almost linear performance cost
-const CANDIDATES_PER_STEP = 25;
+const DEFAULT_CANDIDATES_PER_STEP = 25;
+
+// runtime vars controlled by inputs
+let allowErase = false;
+let onlyImprovements = true;
+let candidateCount = DEFAULT_CANDIDATES_PER_STEP;
 
 function getRandomInt(min, max) { // min max inclusive
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -64,7 +69,7 @@ function getRandomStroke() {
     points.push([getRandomInt(0, WIDTH), getRandomInt(0, HEIGHT)]);
   }
 
-  if (Math.random() < 0.05) {
+  if (allowErase && Math.random() < 0.05) {
     return {
       points: points,
       type: 'clear'
@@ -114,13 +119,12 @@ let running = false;
 function run() {
   if (!running) return;
   console.time('run');
-  // TODO: handle multiple clicks - disable or singleton
 
   // diff is an avg of diff per channel, so it is at most 255*4
   let bestDiff = 255 * 4;
   let bestStroke = null;
 
-  for (let _i=0; _i<CANDIDATES_PER_STEP; _i++) {
+  for (let _i = 0; _i < candidateCount; _i++) {
     const stroke = getRandomStroke();
 
     // reset canvas to saved state
@@ -162,7 +166,7 @@ function run() {
   }
 
   // only add the new stroke if it was an improvement
-  if (bestDiff < previousAvgDiff) {
+  if (bestDiff < previousAvgDiff || onlyImprovements === false) {
     previousAvgDiff = bestDiff;
     // draw composite + new stroke to main canvas,
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -197,6 +201,12 @@ $(document).ready(function() {
 
   sourceCtx = sourceCanvas.getContext('2d');
   ctx = targetCanvas.getContext('2d');
+
+  $('#inputAllowErase').on('change', () => { allowErase = !allowErase; });
+  $('#inputOnlyImprovements').on('change', () => { onlyImprovements = !onlyImprovements; });
+  $('#inputCandidateCount').on('change', () => {
+    candidateCount = parseInt($('#inputCandidateCount').val(), 10) | DEFAULT_CANDIDATES_PER_STEP;
+  });
 
   $(sourceCanvas).on('click', () => { $('#fileInput').trigger('click'); });
   $('#fileInput').on('change', handleImageSelect);

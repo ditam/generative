@@ -12,14 +12,14 @@ canvas:first-child {
   cursor: pointer;
 }
 
-input {
+input[type=file] {
   display: none;
 }
 
 .button {
   display: inline-block;
   margin-right: 30px;
-  padding: 6px;
+  padding: 6px 10px;
   margin: 12px;
   cursor: pointer;
 }
@@ -28,4 +28,13 @@ input {
   max-width: 800px;
   line-height: 1.2em;
   padding: 0 12px;
+}
+
+.settings > div {
+  margin-top: 12px;
+  margin-left: 12px;
+}
+
+#inputCandidateCount {
+  width: 60px;
 }

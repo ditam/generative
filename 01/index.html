@@ -27,6 +27,24 @@
     -- the best brushstroke is kept.
   </div>
 
+  <div class="settings">
+    <div>
+      <label for="allowErase">Allow eraser strokes</label>
+      <input type="checkbox" id="inputAllowErase" name="allowErase">
+    </div>
+
+    <div>
+      <label for="onlyImprovements">Only add brushstroke if result is improved</label>
+      <input type="checkbox" id="inputOnlyImprovements" name="onlyImprovements" checked="checked">
+    </div>
+
+    <div>
+      <label for="candidateCount">Candidate stroke count</label>
+      <input type="number" id="inputCandidateCount" name="candidateCount" value="25">
+    </div>
+
+  </div>
+
   <script src="../ext/jquery.js"></script>
   <script src="main.js"></script>
 </body>
