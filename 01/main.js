@@ -22,8 +22,33 @@ function handleImageSelect() {
   fileReader.addEventListener('load', (evt) => {
     const img = new Image();
     img.addEventListener('load', () => {
+      const _w = img.width;
+      const _h = img.height;
+      let displayW, displayH;
+      let scale;
+      let x0, y0;
+      // figure out distortion-free sizing
+      if (_w > _h) {
+        // wide image -> use full width, adjust height
+        displayW = WIDTH;
+        scale = displayW / _w;
+        displayH = scale * _h;
+        x0 = 0;
+        y0 = (HEIGHT - displayH) / 2;
+      } else {
+        // tall image -> use full height, adjust width
+        displayH = HEIGHT;
+        scale = displayH / _h;
+        displayW = scale * _w;
+        x0 = (WIDTH - displayW) / 2;
+        y0 = 0;
+      }
+
       sourceCtx.clearRect(0, 0, WIDTH, HEIGHT);
-      sourceCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
+      sourceCtx.drawImage(img, x0, y0, displayW, displayH);
+
+      // we can keep diffing the entire canvas - it is a bit wasteful,
+      // but note that we have already "cached" the source data of full size
       sourceImageData = sourceCtx.getImageData(0, 0, WIDTH, HEIGHT).data;
     });
     img.src = evt.target.result;
@@ -110,7 +135,6 @@ function run() {
       bestDiff = avgDiff;
       bestStroke = stroke;
     }
-
   }
 
   // only add the new stroke if it was an improvement
