@@ -5,9 +5,10 @@ const HEIGHT = 333;
 let sourceCtx, ctx;
 let sourceImageData = null;
 
-// as a performance improvement, an off-screen canvas holds the
-// composite image of the strokes selected so far.
-let offscreenCtx;
+// as a performance improvement, off-screen canvases are used:
+// one to save the composite image of the strokes selected so far,
+// one to apply candidate strokes to and calculate diffs
+let compositeCtx, candidateCtx;
 
 const CANDIDATES_PER_STEP = 20;
 const STEP_DELAY = 10;
@@ -74,18 +75,18 @@ function getRandomStroke() {
   };
 }
 
-function drawStroke(_stroke) {
+function drawStroke(_stroke, context) {
   // shifting mutates stroke, so we deep copy
   const stroke = JSON.parse(JSON.stringify(_stroke));
-  ctx.beginPath();
+  context.beginPath();
   const startingPoint = stroke.points.shift();
-  ctx.moveTo(startingPoint[0], startingPoint[1]);
+  context.moveTo(startingPoint[0], startingPoint[1]);
   stroke.points.forEach((point) => {
-    ctx.lineTo(point[0], point[1]);
+    context.lineTo(point[0], point[1]);
   });
-  ctx.lineTo(startingPoint[0], startingPoint[1]);
-  ctx.fillStyle = stroke.color;
-  ctx.fill();
+  context.lineTo(startingPoint[0], startingPoint[1]);
+  context.fillStyle = stroke.color;
+  context.fill();
 }
 
 let previousAvgDiff = 255 * 4;
@@ -101,16 +102,16 @@ function run() {
 
     // reset canvas to saved state
     // NB: drawimage accepts an other canvas, but not a canvasContext
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    ctx.drawImage(offscreenCtx.canvas, 0, 0);
+    candidateCtx.clearRect(0, 0, WIDTH, HEIGHT);
+    candidateCtx.drawImage(compositeCtx.canvas, 0, 0);
 
     // draw candidate
-    drawStroke(stroke);
+    drawStroke(stroke, candidateCtx);
 
     // calculate avg diff to source img
     let count = 0;
     let diffSum = 0;
-    const imageData = ctx.getImageData(0, 0, WIDTH, HEIGHT).data;
+    const imageData = candidateCtx.getImageData(0, 0, WIDTH, HEIGHT).data;
     for (let i = 0; i < imageData.length; i += 4) {
       const sourceRed = sourceImageData[i];
       const sourceGreen = sourceImageData[i + 1];
@@ -140,12 +141,13 @@ function run() {
   // only add the new stroke if it was an improvement
   if (bestDiff < previousAvgDiff) {
     previousAvgDiff = bestDiff;
-    // reload saved state, apply selected stroke and save
+    // draw composite + new stroke to main canvas,
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    ctx.drawImage(offscreenCtx.canvas, 0, 0);
-    drawStroke(bestStroke);
-    offscreenCtx.clearRect(0, 0, WIDTH, HEIGHT);
-    offscreenCtx.drawImage(ctx.canvas, 0, 0);
+    ctx.drawImage(compositeCtx.canvas, 0, 0);
+    drawStroke(bestStroke, ctx);
+    // then save the new composite
+    compositeCtx.clearRect(0, 0, WIDTH, HEIGHT);
+    compositeCtx.drawImage(ctx.canvas, 0, 0);
   }
 
   setTimeout(run, STEP_DELAY);
@@ -159,11 +161,15 @@ $(document).ready(function() {
   $(targetCanvas).attr('width', WIDTH);
   $(targetCanvas).attr('height', HEIGHT);
 
-  // create an offscreen canvas
-  const offscreenCanvas = $('<canvas>');
-  offscreenCanvas.attr('width', WIDTH);
-  offscreenCanvas.attr('height', HEIGHT);
-  offscreenCtx = offscreenCanvas.get(0).getContext('2d');
+  // create off-screen canvases
+  const compositeCanvas = $('<canvas>');
+  compositeCanvas.attr('width', WIDTH);
+  compositeCanvas.attr('height', HEIGHT);
+  compositeCtx = compositeCanvas.get(0).getContext('2d');
+  const candidateCanvas = $('<canvas>');
+  candidateCanvas.attr('width', WIDTH);
+  candidateCanvas.attr('height', HEIGHT);
+  candidateCtx = candidateCanvas.get(0).getContext('2d');
 
   sourceCtx = sourceCanvas.getContext('2d');
   ctx = targetCanvas.getContext('2d');
