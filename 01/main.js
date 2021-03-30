@@ -58,16 +58,23 @@ function handleImageSelect() {
 }
 
 function getRandomStroke() {
-  const r = getRandomInt(0, 255);
-  const g = getRandomInt(0, 255);
-  const b = getRandomInt(0, 255);
-  const a = Math.random();
-
   const verticeCount = 3;
   const points = [];
   for (let i=0; i<verticeCount; i++) {
     points.push([getRandomInt(0, WIDTH), getRandomInt(0, HEIGHT)]);
   }
+
+  if (Math.random() < 0.05) {
+    return {
+      points: points,
+      type: 'clear'
+    };
+  }
+
+  const r = getRandomInt(0, 255);
+  const g = getRandomInt(0, 255);
+  const b = getRandomInt(0, 255);
+  const a = Math.random();
 
   return {
     points: points,
@@ -78,15 +85,28 @@ function getRandomStroke() {
 function drawStroke(_stroke, context) {
   // shifting mutates stroke, so we deep copy
   const stroke = JSON.parse(JSON.stringify(_stroke));
-  context.beginPath();
-  const startingPoint = stroke.points.shift();
-  context.moveTo(startingPoint[0], startingPoint[1]);
-  stroke.points.forEach((point) => {
-    context.lineTo(point[0], point[1]);
-  });
-  context.lineTo(startingPoint[0], startingPoint[1]);
-  context.fillStyle = stroke.color;
-  context.fill();
+
+  if (stroke.type === 'clear') {
+    // we abuse the data structure and consider the first 2 polygon points
+    // as corners of the clearing rectangle. What are you gonna do about it, punk?
+    const P1 = stroke.points.shift();
+    const P2 = stroke.points.shift();
+    const x0 = Math.min(P1[0], P2[0]);
+    const y0 = Math.min(P1[1], P2[1]);
+    const x1 = Math.max(P1[0], P2[0]);
+    const y1 = Math.max(P1[1], P2[1]);
+    context.clearRect(x0, y0, x1-x0, y1-y0);
+  } else {
+    context.beginPath();
+    const startingPoint = stroke.points.shift();
+    context.moveTo(startingPoint[0], startingPoint[1]);
+    stroke.points.forEach((point) => {
+      context.lineTo(point[0], point[1]);
+    });
+    context.lineTo(startingPoint[0], startingPoint[1]);
+    context.fillStyle = stroke.color;
+    context.fill();
+  }
 }
 
 let previousAvgDiff = 255 * 4;
