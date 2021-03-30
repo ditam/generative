@@ -1,5 +1,5 @@
 
-const WIDTH = 400; // should be 600 for 16:9
+const WIDTH = 450; // should be 600 for 16:9
 const HEIGHT = 333;
 
 let sourceCtx, ctx;
@@ -90,7 +90,9 @@ function drawStroke(_stroke, context) {
 }
 
 let previousAvgDiff = 255 * 4;
+let running = false;
 function run() {
+  if (!running) return;
   console.time('run');
   // TODO: handle multiple clicks - disable or singleton
 
@@ -179,7 +181,14 @@ $(document).ready(function() {
   $(sourceCanvas).on('click', () => { $('#fileInput').trigger('click'); });
   $('#fileInput').on('change', handleImageSelect);
 
-  $('.button.clear').on('click', () => { console.log('clear'); });
-  $('.button.run').on('click', run);
-  $('.button.stop').on('click', () => { console.log('stop'); });
+  $('.button.clear').on('click', () => {
+    running = false;
+    previousAvgDiff = 255 * 4;
+    sourceCtx.clearRect(0, 0, WIDTH, HEIGHT);
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    compositeCtx.clearRect(0, 0, WIDTH, HEIGHT);
+    candidateCtx.clearRect(0, 0, WIDTH, HEIGHT);
+  });
+  $('.button.run').on('click', () => { running = true; run(); });
+  $('.button.stop').on('click', () => { running = false; });
 });
