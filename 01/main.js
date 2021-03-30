@@ -10,8 +10,8 @@ let sourceImageData = null;
 // one to apply candidate strokes to and calculate diffs
 let compositeCtx, candidateCtx;
 
-const CANDIDATES_PER_STEP = 20;
-const STEP_DELAY = 10;
+// increase this for better convergence, but note that it has an almost linear performance cost
+const CANDIDATES_PER_STEP = 25;
 
 function getRandomInt(min, max) { // min max inclusive
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -91,6 +91,7 @@ function drawStroke(_stroke, context) {
 
 let previousAvgDiff = 255 * 4;
 function run() {
+  console.time('run');
   // TODO: handle multiple clicks - disable or singleton
 
   // diff is an avg of diff per channel, so it is at most 255*4
@@ -150,7 +151,8 @@ function run() {
     compositeCtx.drawImage(ctx.canvas, 0, 0);
   }
 
-  setTimeout(run, STEP_DELAY);
+  console.timeEnd('run');
+  requestAnimationFrame(run);
 }
 
 $(document).ready(function() {
