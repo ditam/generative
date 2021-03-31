@@ -69,7 +69,7 @@ function getRandomStroke() {
     points.push([getRandomInt(0, WIDTH), getRandomInt(0, HEIGHT)]);
   }
 
-  if (allowErase && Math.random() < 0.05) {
+  if (allowErase && Math.random() < 0.08) {
     return {
       points: points,
       type: 'clear'
@@ -92,17 +92,18 @@ function drawStroke(_stroke, context) {
   const stroke = JSON.parse(JSON.stringify(_stroke));
 
   if (stroke.type === 'clear') {
-    // we abuse the data structure and consider the first 2 polygon points
-    // as corners of the clearing rectangle. What are you gonna do about it, punk?
-    // TODO: we should be able to support polygon clears with different compositing modes,
-    //       see https://stackoverflow.com/a/8446964
-    const P1 = stroke.points.shift();
-    const P2 = stroke.points.shift();
-    const x0 = Math.min(P1[0], P2[0]);
-    const y0 = Math.min(P1[1], P2[1]);
-    const x1 = Math.max(P1[0], P2[0]);
-    const y1 = Math.max(P1[1], P2[1]);
-    context.clearRect(x0, y0, x1-x0, y1-y0);
+    context.save();
+      context.globalCompositeOperation = 'destination-out';
+      context.beginPath();
+      const startingPoint = stroke.points.shift();
+      context.moveTo(startingPoint[0], startingPoint[1]);
+      stroke.points.forEach((point) => {
+        context.lineTo(point[0], point[1]);
+      });
+      context.lineTo(startingPoint[0], startingPoint[1]);
+      context.fillStyle = 'black'; // any opaque color should do for this compositing
+      context.fill();
+    context.restore();
   } else {
     context.beginPath();
     const startingPoint = stroke.points.shift();
