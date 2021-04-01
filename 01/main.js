@@ -14,7 +14,7 @@ let compositeCtx, candidateCtx;
 const DEFAULT_CANDIDATES_PER_STEP = 25;
 
 // runtime vars controlled by inputs
-let allowErase = false;
+let allowErase = true;
 let onlyImprovements = true;
 let candidateCount = DEFAULT_CANDIDATES_PER_STEP;
 
