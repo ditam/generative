@@ -55,12 +55,12 @@ const compositeOperations = [
 
 function draw(time) {
   if (getRandomInt(0, 100) < 5) {
+    const size = WIDTH > HEIGHT? WIDTH : HEIGHT;
     drops.push({
-      x: getRandomInt(0, WIDTH) - WIDTH/2,
-      // Note that the canvas gets rotated, so both directions are limited by WIDTH
-      // (assuming width > height), otherwise you will see the screen shaped area rotate
-      y: getRandomInt(0, WIDTH) - WIDTH/2,
-      r: getRandomInt(2, 15),
+      x: getRandomInt(0, size) - size/2,
+      // Note that the canvas gets rotated, so both directions are limited by the same size
+      y: getRandomInt(0, size) - size/2,
+      r: getRandomInt(1, 15),
       color: getRandomColor()
     });
   }
