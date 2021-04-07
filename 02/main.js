@@ -55,6 +55,9 @@ const compositeOperations = [
 
 function draw(time) {
   if (getRandomInt(0, 100) < 5) {
+    if (drops.length > 150) {
+      drops.shift();
+    }
     const size = WIDTH > HEIGHT? WIDTH : HEIGHT;
     drops.push({
       x: getRandomInt(0, size) - size/2,
