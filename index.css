@@ -1,0 +1,67 @@
+body {
+  margin: 12px;
+}
+
+h1 {
+  font-size: 16px;
+  padding-bottom: 16px;
+  font-weight: 600;
+}
+
+ol {
+  list-style-type: decimal-leading-zero;
+  list-style-position: inside;
+  margin-top: 32px;
+}
+
+ol ::marker {
+  font-family: monospace;
+  font-size: 15px;
+}
+
+ol li {
+  line-height: 20px;
+}
+
+ol li:before {
+  content: ""; /* hack to decrease distance from bullet */
+  margin-left: -4px;
+}
+
+.buttons {
+  margin-left: 10px;
+  user-select: none;
+}
+
+.button {
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.button.selected {
+  background-color: #ededed;
+}
+
+.button:not(.selected):hover {
+  background-color: #f8f8f8;
+}
+
+.description.standard .techy,
+.description.standard .journo {
+  display: none;
+}
+
+.description.techy .standard,
+.description.techy .journo {
+  display: none;
+}
+
+.description.journo .standard,
+.description.journo .techy {
+  display: none;
+}
+
+.description > span::before {
+  content: ' - ';
+}

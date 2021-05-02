@@ -6,36 +6,38 @@
   <title>Generative art experiments - index</title>
 
   <link rel="stylesheet" type="text/css" href="ext/reset.css">
-  <style type="text/css">
-    body {
-      margin: 12px;
-    }
-    h1 {
-      font-size: 16px;
-      padding-bottom: 16px;
-    }
-    ol {
-      list-style-type: decimal-leading-zero;
-      list-style-position: inside;
-    }
-    ol ::marker {
-      font-family: monospace;
-      font-size: 15px;
-    }
-    ol li {
-      line-height: 18px;
-    }
-    ol li:before {
-      content: ""; /* hack to decrease distance from bullet */
-      margin-left: -4px;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="index.css">
 </head>
 <body>
   <h1>A collection of small generative art experiments</h1>
+  <div>
+    Description style:
+    <span class="buttons">
+      <span class="button selected" data-style="standard">Standard</span>
+      <span class="button" data-style="techy">Techy</span>
+      <span class="button" data-style="journo">Journo</span>
+    </span>
+  </div>
   <ol>
-    <li><a href="01/">Shards</a> - repainting images with a low-sample Monte Carlo simulation</li>
-    <li><a href="02/">Swirl</a> - an ever-changing dance of colors</li>
+    <li>
+      <a href="01/">Shards</a>
+      <span class="description standard">
+        <span class="standard">repainting images with random strokes</span>
+        <span class="techy">approximating images with a low-sample Monte Carlo simulation</span>
+        <span class="journo">will AI make artists obsolete?</span>
+      </span>
+    </li>
+    <li>
+      <a href="02/">Swirl</a>
+      <span class="description standard">
+        <span class="standard">an ever-changing dance of colors</span>
+        <span class="techy">cycling through the HTML5 canvas composition operations</span>
+        <span class="journo">California teen goes into seizure looking at this</span>
+      </span>
+    </li>
   </ol>
+
+  <script src="../ext/jquery.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>
